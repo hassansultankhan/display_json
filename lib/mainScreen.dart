@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert'; // Import for JSON decoding
 import 'dart:io'; // Import for file I/O
 
@@ -20,11 +21,13 @@ class _mainScreenState extends State<mainScreen> {
 
   Future<void> _loadJsonData() async {
     final jsonContent = await loadJsonDataFromExternalPath(
-        'C:\\Users\\pakih\\projects\\python_1\\output.json');
-    final decodedData = json.decode(jsonContent);
-    setState(() {
-      jsonData = decodedData;
-    });
+        'C:\\Users\\pakih\\projects\\python_1\\data.json');
+    if (jsonContent.isNotEmpty) {
+      final decodedData = json.decode(jsonContent);
+      setState(() {
+        jsonData = decodedData;
+      });
+    }
   }
 
   @override
@@ -39,9 +42,9 @@ class _mainScreenState extends State<mainScreen> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(jsonData[index]
-                ['title']), // Assuming there's a 'title' key in JSON
-            subtitle: Text(jsonData[index][
-                'description']), // Assuming there's a 'description' key in JSON
+                ['Name']), // Assuming there's a 'Name' key in JSON
+            subtitle: Text(
+                "Age: ${jsonData[index]['Age']}"), // Assuming there's an 'Age' key in JSON
           );
         },
       ),
@@ -52,6 +55,10 @@ class _mainScreenState extends State<mainScreen> {
 Future<String> loadJsonDataFromExternalPath(String filePath) async {
   try {
     File jsonFile = File(filePath);
+    if (!await jsonFile.exists()) {
+      print('JSON file does not exist at the specified path.');
+      return '';
+    }
     String jsonContent = await jsonFile.readAsString();
     return jsonContent;
   } catch (e) {
